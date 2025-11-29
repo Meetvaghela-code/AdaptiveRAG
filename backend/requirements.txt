@@ -12,3 +12,4 @@ langchain-google-genai
 langchain-huggingface
 sentence-transformers
 pysqlite3-binary
+gunicorn
