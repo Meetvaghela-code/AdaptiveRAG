@@ -1,0 +1,17 @@
+Ignore Backend Virtual Environment
+
+backend/venv/
+backend/.venv/
+venv/
+.venv/
+pycache/
+*.pyc
+
+Ignore Frontend Heavy Modules
+
+frontend/node_modules/
+frontend/dist/
+
+Ignore Environment Variables (Security)
+
+.env
