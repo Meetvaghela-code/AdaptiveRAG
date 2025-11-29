@@ -151,6 +151,10 @@ app_graph = workflow.compile()
 
 # --- API ENDPOINTS ---
 
+@app.get("/")
+def read_root():
+    return {"status": "Adaptive RAG Backend (FAISS) is running"}
+
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     global retriever, vectorstore
