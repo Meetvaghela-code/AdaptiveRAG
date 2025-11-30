@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FaBrain, FaGlobeAmericas, FaLayerGroup, FaGithub, FaLinkedin, FaHeart, FaCode, FaArrowRight } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBrain, FaGlobeAmericas, FaLayerGroup, FaGithub, FaLinkedin, FaHeart, FaCode, FaTimes, FaPlay, FaExclamationTriangle } from 'react-icons/fa';
 import ChatInterface from './components/ChatInterface';
 import LiveGraph from './components/LiveGraph';
 import Problem from './components/Problem';
@@ -12,19 +12,119 @@ const fadeInUp = {
 };
 
 const App = () => {
+  // State for Video Modal and Notification
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+
+  // Trigger notification on load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowNotification(true);
+    }, 1500); // Shows 1.5s after load
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div>
-      {/* 1. Navbar */}
+      {/* --- 1. NOTIFICATION TOAST --- */}
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="position-fixed"
+            style={{ top: '80px', right: '20px', zIndex: 1050, maxWidth: '350px' }}
+          >
+            <div className="bg-dark border border-secondary p-3 rounded shadow-lg position-relative">
+              {/* Arrow pointing up to Nav */}
+              <div 
+                className="position-absolute bg-dark border-top border-start border-secondary"
+                style={{ width: '12px', height: '12px', top: '-7px', right: '40px', transform: 'rotate(45deg)' }}
+              ></div>
+
+              <button 
+                onClick={() => setShowNotification(false)}
+                className="btn btn-sm text-secondary position-absolute top-0 end-0 p-2"
+              >
+                <FaTimes />
+              </button>
+
+              <div className="d-flex gap-3">
+                <div className="text-warning mt-1">
+                  <FaExclamationTriangle />
+                </div>
+                <div>
+                  <h6 className="text-white mb-1 fw-bold">System Offline</h6>
+                  <p className="text-secondary small mb-2 lh-sm">
+                    Our chat system is currently not on the server, so you cannot experience it live.
+                  </p>
+                  <p className="text-white small mb-0 fw-bold border-top border-secondary pt-2">
+                    👉 Click "Try Demo" to watch the video!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- 2. VIDEO MODAL --- */}
+      <AnimatePresence>
+        {isVideoOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+            style={{ zIndex: 2000, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)' }}
+          >
+            <div className="container position-relative">
+              <button 
+                onClick={() => setIsVideoOpen(false)}
+                className="btn btn-circle btn-dark border border-secondary text-white position-absolute top-0 end-0 m-3 translate-middle-y"
+                style={{ zIndex: 2001 }}
+              >
+                <FaTimes size={20} />
+              </button>
+              
+              <div className="ratio ratio-16x9 border border-secondary rounded shadow-lg overflow-hidden">
+                {/* IMPORTANT: Make sure 'demo.mp4' is in your /public folder 
+                */}
+                <video controls autoPlay className="w-100 h-100">
+                  <source src="/adaptiverag.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className="text-center mt-3">
+                 <p className="text-secondary">Project Walkthrough</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+      {/* --- 3. NAVBAR --- */}
       <nav className="navbar fixed-top glass-nav py-3">
         <div className="container">
           <a className="navbar-brand fw-bold text-white fs-4" href="#">
             Adaptive<span className="text-secondary">RAG</span>
           </a>
-          <a href="#demo" className="btn btn-sm btn-light rounded-pill px-4 fw-bold">Try Demo</a>
+          
+          {/* Updated Try Demo Button */}
+          <button 
+            onClick={() => setIsVideoOpen(true)}
+            className={`btn btn-sm rounded-pill px-4 fw-bold d-flex align-items-center gap-2 ${showNotification ? 'btn-light pulse-button' : 'btn-light'}`}
+            style={{ transition: 'all 0.3s' }}
+          >
+            <FaPlay size={10} />
+            Try Demo
+          </button>
         </div>
       </nav>
 
-      {/* 2. Hero Section */}
+      {/* --- 4. HERO SECTION --- */}
       <section className="d-flex flex-column align-items-center justify-content-center text-center min-vh-100 position-relative overflow-hidden">
         {/* Ambient Glow */}
         <div className="position-absolute" style={{width: '60vw', height: '60vw', background: 'radial-gradient(circle, rgba(41,151,255,0.15) 0%, rgba(0,0,0,0) 60%)', filter: 'blur(100px)', zIndex: -1, top: '-10%'}}></div>
@@ -40,7 +140,8 @@ const App = () => {
               A RAG system that understands context. It automatically switches between your documents and the web.
             </p>
             <div className="d-flex gap-3 justify-content-center">
-               <a href="#demo" className="btn btn-apple">Launch System</a>
+               {/* Launch System also triggers video since system is offline */}
+               <button onClick={() => setIsVideoOpen(true)} className="btn btn-apple">Launch System</button>
                <a href="#architecture" className="btn btn-apple-outline">How it works</a>
             </div>
           </motion.div>
@@ -57,7 +158,7 @@ const App = () => {
 
       <Problem />
 
-      {/* 3. The Architecture Section (Refined Layout) */}
+      {/* --- 5. ARCHITECTURE SECTION --- */}
       <section className="py-5 bg-black" id="architecture">
         <div className="container py-5">
             <motion.div 
@@ -70,7 +171,7 @@ const App = () => {
                         <p className="text-secondary fs-5 mb-0">How we solved the "Hallucination" problem.</p>
                     </div>
                     <div className="col-lg-6 text-lg-end d-none d-lg-block">
-                         <span className="text-secondary small">Powered by LangGraph & Tavily</span>
+                          <span className="text-secondary small">Powered by LangGraph & Tavily</span>
                     </div>
                 </div>
             </motion.div>
@@ -138,7 +239,7 @@ const App = () => {
         </div>
       </section>
 
-      {/* 4. Live Demo Section */}
+      {/* --- 6. LIVE DEMO SECTION (Kept for layout, but interactive part replaced with visual) --- */}
       <section className="py-5" style={{background: 'linear-gradient(to bottom, #000, #050507)'}}>
          <div className="container pt-5">
             <div className="text-center mb-5">
@@ -149,13 +250,10 @@ const App = () => {
          </div>
       </section>
 
-      {/* Footer */}
-      {/* Enhanced Footer */}
+      {/* --- 7. FOOTER --- */}
       <footer className="py-5" style={{ background: '#050507', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="container">
           <div className="row g-4 mb-5">
-            
-            {/* Column 1: Brand & Mission */}
             <div className="col-lg-4 col-md-12 mb-4 mb-lg-0">
               <h5 className="fw-bold text-white mb-3">Adaptive<span className="text-secondary">RAG</span></h5>
               <p className="text-secondary small pe-lg-5" style={{maxWidth: '300px'}}>
@@ -164,16 +262,15 @@ const App = () => {
               </p>
             </div>
 
-            {/* Column 2: Quick Links */}
             <div className="col-6 col-lg-2 col-md-4">
               <h6 className="text-white fw-bold mb-3 small text-uppercase tracking-wide">Project</h6>
               <ul className="list-unstyled text-secondary small d-flex flex-column gap-2">
                 <li><a href="#architecture" className="text-secondary hover-white text-decoration-none">Architecture</a></li>
-                <li><a href="#demo" className="text-secondary hover-white text-decoration-none">Live Demo</a></li>
+                {/* Updated link to trigger video */}
+                <li><span onClick={() => setIsVideoOpen(true)} className="text-secondary hover-white text-decoration-none cursor-pointer">Live Demo</span></li>
               </ul>
             </div>
 
-            {/* Column 3: Tech Stack */}
             <div className="col-6 col-lg-2 col-md-4">
               <h6 className="text-white fw-bold mb-3 small text-uppercase tracking-wide">Technology</h6>
               <ul className="list-unstyled text-secondary small d-flex flex-column gap-2">
@@ -185,7 +282,6 @@ const App = () => {
               </ul>
             </div>
 
-            {/* Column 4: Socials */}
             <div className="col-lg-4 col-md-4">
               <h6 className="text-white fw-bold mb-3 small text-uppercase tracking-wide">Connect</h6>
               <div className="d-flex gap-3">
@@ -199,7 +295,6 @@ const App = () => {
             </div>
           </div>
 
-          {/* Bottom Bar: Copyright */}
           <div className="border-top pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
             <p className="text-secondary small mb-2 mb-md-0">
               &copy; {new Date().getFullYear()} Adaptive RAG Project. All rights reserved.
