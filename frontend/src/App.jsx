@@ -69,7 +69,7 @@ const App = () => {
         )}
       </AnimatePresence>
 
-      {/* --- 2. VIDEO MODAL --- */}
+{/* --- 2. VIDEO MODAL --- */}
       <AnimatePresence>
         {isVideoOpen && (
           <motion.div 
@@ -79,25 +79,28 @@ const App = () => {
             className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
             style={{ zIndex: 2000, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)' }}
           >
-            <div className="container position-relative">
+            {/* WRAPPER: Removed 'container', added custom maxWidth for perfect sizing */}
+            <div className="position-relative w-100" style={{ maxWidth: '850px', margin: '0 20px' }}>
+              
+              {/* Close Button: Positioned slightly floating on the top-right corner */}
               <button 
                 onClick={() => setIsVideoOpen(false)}
-                className="btn btn-circle btn-dark border border-secondary text-white position-absolute top-0 end-0 m-3 translate-middle-y"
-                style={{ zIndex: 2001 }}
+                className="btn btn-dark border border-secondary text-white position-absolute rounded-circle d-flex align-items-center justify-content-center shadow"
+                style={{ zIndex: 2001, top: '-20px', right: '-10px', width: '40px', height: '40px' }}
               >
-                <FaTimes size={20} />
+                <FaTimes size={16} />
               </button>
               
-              <div className="ratio ratio-16x9 border border-secondary rounded shadow-lg overflow-hidden">
-                {/* IMPORTANT: Make sure 'demo.mp4' is in your /public folder 
-                */}
+              <div className="ratio ratio-16x9 border border-secondary rounded shadow-lg overflow-hidden bg-black">
+                {/* IMPORTANT: Make sure 'adaptiverag.mp4' is in your /public folder */}
                 <video controls autoPlay className="w-100 h-100">
                   <source src="/adaptiverag.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
+              
               <div className="text-center mt-3">
-                 <p className="text-secondary">Project Walkthrough</p>
+                 <p className="text-secondary small font-monospace">PROJECT WALKTHROUGH</p>
               </div>
             </div>
           </motion.div>
